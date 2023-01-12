@@ -37,7 +37,7 @@ on during the workshop. Navigate back to the main folder
 ```shell
 pip install -e .
 ```
-in your shell. This will install the (empty) package located in
+in your shell. This will install the package located in
 ``./utils``. For more details check the ``setup.py`` file.
 
 ## IDE
