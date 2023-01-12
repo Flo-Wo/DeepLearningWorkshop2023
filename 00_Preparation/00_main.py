@@ -4,6 +4,7 @@
 # To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/.
 
 from fnn import DataLoaderFNN
+import torch
 import matplotlib.pyplot as plt
 
 
@@ -35,6 +36,15 @@ def analyze_distribution(data_loader: DataLoaderFNN, relative: bool = False):
     # occurency of all labels (by using torch.bincount() and computes the average
     # The resulting frequencies are visualized in a matplotlib bar chart
     pass
+
+
+def _dist_dataset(dataset, relative=False):
+    num = torch.zeros(10)
+    for _, batch_label in dataset:
+        num += torch.bincount(batch_label)
+    if not relative:
+        return num
+    return num / torch.sum(num)
 
 
 if __name__ == "__main__":
