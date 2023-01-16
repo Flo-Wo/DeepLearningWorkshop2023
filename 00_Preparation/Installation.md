@@ -1,19 +1,6 @@
 # Installation
 
-## Anaconda environment
-If you use (ana)conda, you can directly create an environment and install
-the required packages by using the ``env.yml`` file attached in this folder.
-Run the command
-```shell
-conda env create -f env.yml
-```
-in your shell. You can activate the environment by running the command
-```shell
-conda activate dl-workshop
-```
-in your shell
-
-## Installation via pip (Recommended)
+## Installation via pip
 If you do not use conda, you can also install the required packages via pip
 and the attached ``requirements.txt`` file. Create a new virtual environment and
 run the command
