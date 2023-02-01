@@ -29,4 +29,4 @@ be a good opportunity to check whether the installation process above worked.
 
 ### 3) Preparation Assignment
 Open the file ``./00_Preparation/00_Preparation.pdf`` and follow the instructions listed there. We will provide
-a **solution proposal one week before the workshop takes place**.
+a **solution proposal two weeks before the workshop takes place**.
