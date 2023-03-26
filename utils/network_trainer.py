@@ -150,8 +150,7 @@ class NetworkTrainer:
             # TODO: 3,a) Define two variables train_loss and validation_loss initialized
             # with the values 0, you can see in the code below how they are going to be used
             # ============
-            train_loss = 0
-            validation_loss = 0
+
             # ============
 
             # TRAIN
@@ -164,21 +163,14 @@ class NetworkTrainer:
                 # TODO: 3,b) Take a look at the constructor's documentation for a detailed
                 # description of the different components (in total ~5 lines of code)
                 # ============
-                optimizer.zero_grad()
-                predicted_output = model(*input_data)
-                loss = criterion(predicted_output, target_output)
-
-                loss += regularization(model)
 
                 # backward propagation step + optimizer step
-                loss.backward()
-                optimizer.step()
+
                 # ============
 
                 # TODO: 3,c)
                 # Return the actual loss value by calling .item() --> gives a scalar value
                 # ============
-                train_loss += loss.item()
                 # ============
 
                 train_correct += sum_correct_preds(predicted_output, target_output)
@@ -186,7 +178,6 @@ class NetworkTrainer:
             # TODO: 3,c)
             # Compute the average train loss, len_train_data is the number of mini batches we use
             # ============
-            train_loss /= len_train_data
             # ============
 
             # VALIDATION
@@ -197,17 +188,6 @@ class NetworkTrainer:
             # By using ``torch.no_grad()`` we disable the backward pass in the computational graph
             # to save time and reduce our memory footprint
             # ============
-            with torch.no_grad():
-                for batch_idx, (*input_data, target_output) in enumerate(
-                    tqdm(validation_dataset, "Validation")
-                ):
-                    predicted_output = model(*input_data)
-                    loss = criterion(predicted_output, target_output)
-                    validation_loss += loss.item()
-
-                    val_correct += sum_correct_preds(predicted_output, target_output)
-
-            validation_loss /= len_val_data
             # ============
 
             # show results of the training
