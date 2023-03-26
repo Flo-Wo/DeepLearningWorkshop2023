@@ -164,13 +164,12 @@ class NetworkTrainer:
                 # description of the different components (in total ~5 lines of code)
                 # ============
 
-                # backward propagation step + optimizer step
-
                 # ============
 
                 # TODO: 3,c)
                 # Return the actual loss value by calling .item() --> gives a scalar value
                 # ============
+
                 # ============
 
                 train_correct += sum_correct_preds(predicted_output, target_output)
@@ -178,6 +177,7 @@ class NetworkTrainer:
             # TODO: 3,c)
             # Compute the average train loss, len_train_data is the number of mini batches we use
             # ============
+
             # ============
 
             # VALIDATION
@@ -188,6 +188,7 @@ class NetworkTrainer:
             # By using ``torch.no_grad()`` we disable the backward pass in the computational graph
             # to save time and reduce our memory footprint
             # ============
+
             # ============
 
             # show results of the training
