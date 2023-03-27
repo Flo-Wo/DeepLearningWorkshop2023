@@ -46,7 +46,10 @@ def _dense_layer(
     # ============
     if batch_normalize:
         # TODO: Bonus,b)
-        pass
+        # We do not need a bias here, as the bias is already included,
+        # in BatchNorm1d, as we have a learnable linear offset
+        steps.append(nn.Linear(input_shape, output_shape, bias=False))
+        steps.append(nn.BatchNorm1d(num_features=output_shape))
     else:
         # TODO: 2,a) Add linear layer
         steps.append(nn.Linear(input_shape, output_shape))
@@ -76,8 +79,13 @@ def _init_weights(layer: torch.nn):
     # inside our constructor and all the layers are passed into the function
     # We check for the type of the layer and change it's default weights and biases
 
-    print(type(layer))
+    # print(type(layer))
     # ============
+    if isinstance(layer, nn.Linear):
+        torch.nn.init.xavier_uniform_(
+            layer.weight,  # gain=nn.init.calculate_gain('relu')
+        )
+        torch.nn.init.zeros_(layer.bias)
     # ============
 
 
