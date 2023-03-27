@@ -184,9 +184,6 @@ class NetworkTrainer:
             model.eval()
             val_correct = 0
             # TODO: 3,d)
-            # We turn off backpropagation as we don't want to perform a backpropagation step
-            # By using ``torch.no_grad()`` we disable the backward pass in the computational graph
-            # to save time and reduce our memory footprint
             # ============
 
             # ============
