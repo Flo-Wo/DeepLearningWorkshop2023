@@ -42,8 +42,18 @@ def _dense_layer(
     # Attention: the flag batch_normalize is part of the bonus task, so you
     # can ignore this parameter
     steps = []
-    # ============
 
+    # ============
+    if batch_normalize:
+        # TODO: Bonus,b)
+        pass
+    else:
+        # TODO: 2,a) Add linear layer
+        steps.append(nn.Linear(input_shape, output_shape))
+
+    # TODO: 2,a) Add activation function
+    if activation_func is not None:
+        steps.append(activation_func())
     # ============
     return nn.Sequential(*steps)
 
@@ -66,9 +76,8 @@ def _init_weights(layer: torch.nn):
     # inside our constructor and all the layers are passed into the function
     # We check for the type of the layer and change it's default weights and biases
 
-    # print(type(layer))
+    print(type(layer))
     # ============
-
     # ============
 
 
@@ -106,7 +115,19 @@ class FNN(nn.Module):
         # TODO: 2,b) Define two hidden layers by calling your _dense_layer method,
         # add an additional output layer
         # ============
-
+        self.l1 = _dense_layer(
+            input_shape,
+            hidden_shape,
+            activation_func=activation_func,
+            batch_normalize=use_batch_norm,
+        )
+        self.l2 = _dense_layer(
+            hidden_shape,
+            hidden_shape,
+            activation_func=activation_func,
+            batch_normalize=use_batch_norm,
+        )
+        self.l3 = _dense_layer(hidden_shape, num_classes)
         # ============
 
         # TODO: Bonus,c) Change the default initialization for the network's
@@ -132,7 +153,9 @@ class FNN(nn.Module):
         # TODO: 2,c) Take a look at the function header, implement
         # the forward pass
         # ============
-        pass
+        out = self.l1(input)
+        out2 = self.l2(out)
+        return self.l3(out2)
         # ============
 
 
@@ -156,17 +179,25 @@ class DataLoaderFNN:
                 # transform the images to a torch tensor and afterwards
                 # to vector shaped tensor
                 # ============
-                # transforms.ToTensor(),
-                # transforms.Lambda(lambda x: x.reshape(28 * 28)),
+                transforms.ToTensor(),
+                transforms.Lambda(lambda x: x.reshape(28 * 28)),
                 # ============
             ]
         )
+
+        # optional transformation to one-hot-vector for the target data
+        # target_transform = transforms.Lambda(
+        #     lambda y: torch.zeros(10, dtype=torch.float).scatter_(
+        #         0, torch.tensor(y), value=1
+        #     )
+        # )
 
         total_train_dataset = torchvision.datasets.MNIST(
             root="./data",
             train=True,
             transform=data_transform,
             download=True,
+            # target_transform=target_transform,
         )
         len_train = int(len(total_train_dataset) * train_val_ratio)
         len_val = len(total_train_dataset) - len_train
@@ -177,13 +208,14 @@ class DataLoaderFNN:
             [
                 len_train,
                 len_val,
-            ],
+            ],  # optional: use a generator=torch.Generator().manual_seed(1) for deterministic behaviour
         )
         test_dataset = torchvision.datasets.MNIST(
             root="./data",
             train=False,
             transform=data_transform,
             download=True,
+            # target_transform=target_transform,
         )
         # define the DataLoader, which are going to be used in the stages of the NetworkTrainer
         self.train_loader = torch.utils.data.DataLoader(
@@ -232,3 +264,8 @@ class DataLoaderFNN:
         print("Train data: {}".format(len(self.train_loader.dataset)))
         print("Valid data: {}".format(len(self.val_loader.dataset)))
         print("Test data: {}".format(len(self.test_loader.dataset)))
+
+
+if __name__ == "__main__":
+    net = FNN(28 * 28, 500, 10, torch.nn.ReLU)
+    print(net)
