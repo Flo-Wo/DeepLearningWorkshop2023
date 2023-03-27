@@ -112,9 +112,9 @@ if __name__ == "__main__":
     )
     # ============
 
-    # # TODO: 4,b)
-    # # We pass all arguments the constructor takes into the trainer by using
-    # # a dictionary
+    # TODO: 4,b)
+    # We pass all arguments the constructor takes into the trainer by using
+    # a dictionary
     # ============
     network_params = {
         "input_shape": 28 * 28,
@@ -199,9 +199,9 @@ if __name__ == "__main__":
     # )
     # plot_performance([cache_default, cache_batch_norm])
 
-    # # TODO: 4,d) Check the description of the NetworkUser's ``get_predictor``-function
-    # # We extract the prediction function of the Networkuser to manually test our network
-    # # on a few images
+    # TODO: 4,d) Check the description of the NetworkUser's ``get_predictor``-function
+    # We extract the prediction function of the Networkuser to manually test our network
+    # on a few images
     # ============
     predict = user.get_predictor(network_params, path)
     # ============
