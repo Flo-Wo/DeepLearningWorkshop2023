@@ -45,7 +45,7 @@ def _plot_images(
         plt.title(title)
 
         plt.axis("off")
-    fig.savefig("./01_sheet/imgs/numbers.pdf")
+    # fig.savefig("./01_sheet/imgs/numbers.pdf")
     plt.show()
 
 
