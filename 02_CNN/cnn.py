@@ -82,7 +82,6 @@ class SNN(nn.Module):
 
         # ===============
         x = self.features(x)
-        # reshape x: (batch_size, 32, 5, 5) -> (batch_size, 2048)
         x = x.view(x.size()[0], -1)
         # ===============
         return self.compression(x)
