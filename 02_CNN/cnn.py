@@ -15,7 +15,11 @@ import numpy as np
 # behavior to init the weights and biases
 def init_weights(self, layer):
     # ===============
-    pass
+    if isinstance(layer, nn.Linear):
+        torch.nn.init.xavier_uniform(layer.weight)
+        layer.bias.data.fill_(0.01)
+    elif isinstance(layer, nn.Conv2d):
+        pass
     # ===============
 
 
@@ -28,18 +32,32 @@ class SNN(nn.Module):
         # ===============
         # Build the CNN part
         self.features = nn.Sequential(
-            # TODO
+            # first cnn layer
+            nn.Conv2d(3, 16, 10),
+            # using inplace=True can reduce the internal memory footprint
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),
+            # second cnn layer
+            nn.Conv2d(16, 32, 7),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),
+            # third cnn layer
+            nn.Conv2d(32, 32, 4),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),
         )
         # ===============
 
         # TODO: 2,b) Build the Compression part by using a fully connected layer
         # ===============
-        self.compression = 
+        # Define the fully connected layer to compress the features maps
+        self.compression = nn.Sequential(nn.Linear(2048, 800), nn.ReLU())
         # ===============
 
         # TODO. 2,c) Add the similarity measure part of our SNN
         # ===============
-        self.similarity = 
+        # define the last layer via fcl + sigmoid --> similarity measure
+        self.similarity = nn.Sequential(nn.Linear(800, 1), nn.Sigmoid())
         # ===============
 
         # self.apply(init_weights)
@@ -59,11 +77,13 @@ class SNN(nn.Module):
         torch.tensor
             Extracted features, shape depends on the design of the CNN-part.
         """
-        # TODO: 2,a) Call the feature extraction and the
+        # TODO: 2,a) Call the feature feature extraction and the
         # compression part (hint: read the docstring)
 
         # ===============
-
+        x = self.features(x)
+        # reshape x: (batch_size, 32, 5, 5) -> (batch_size, 2048)
+        x = x.view(x.size()[0], -1)
         # ===============
         return self.compression(x)
 
@@ -89,9 +109,11 @@ class SNN(nn.Module):
         # TODO: 2, c) Use the _forward_once function appropriately and
         # call the similiarity part afterwards (hint: read the docstring)
         # ===============
-
-        return 
+        out1 = self._forward_once(input1)
+        out2 = self._forward_once(input2)
+        dist = torch.abs(out1 - out2)
         # ===============
+        return self.similarity(dist)
 
 
 class DataLoaderSNN:
