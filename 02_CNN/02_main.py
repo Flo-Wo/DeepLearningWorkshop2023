@@ -7,18 +7,29 @@ from cnn import SNN, DataLoaderSNN
 import torch
 import torch.nn as nn
 from torchvision import transforms
-from utils.plotting import plot_performance
 
 if __name__ == "__main__":
     # TODO: 2,d)
     # ===============
-
+    # we need to resize the data to get a uniform shape and transform it into tensors
+    transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Resize((100, 100)),
+        ]
+    )
     # ===============
 
     # TODO: 2,d) Instantiate your DataLoader
     # ===============
     data_loader = DataLoaderSNN(
-        # TODO
+        train_meta_path="./data/train_data.csv",
+        train_path="./data/train_data/",
+        test_meta_path="./data/test_data.csv",
+        test_path="./data/test_data/",
+        train_val_ratio=0.85,
+        batch_size=100,
+        transform=transform,
     )
     # ===============
 
@@ -26,7 +37,12 @@ if __name__ == "__main__":
     # torch.optim.lr_schuler.ReduceLRonPlateau)
     # ===============
     trainer = NetworkTrainer(
-        # TODO
+        SNN,
+        torch.nn.BCELoss,
+        torch.optim.Adam,
+        torch.optim.lr_scheduler.ReduceLROnPlateau,
+        data_loader,
+        folder="./metadata/",
     )
     network_params = {}
     # ===============
@@ -59,20 +75,33 @@ if __name__ == "__main__":
             Number of correct predictions (depends on the decision threshold).
         """
         # ===============
+        # use p=0.5 as a threshold, if value > p => return 1, else 0
+        pred = torch.where(
+            prediction_output > threshold, 1, 0
+        )  # get the index of the max log-probability
         # ===============
-        pass
+        return pred.eq(target_output.view_as(pred)).sum().item()
 
     # TODO: 2,d) Train your network using the trainer instantiated above
     # ===============
     path = trainer.train_network(
-        # TODO
+        10,
+        network_params,
+        loss_params={},
+        optimizer_params={},
+        scheduler_params={},
+        sum_correct_preds=sum_correct_preds,
     )
     # ===============
 
     # TODO. 2,e) Evaluate your network
     # ===============
-    user = 
+    user = NetworkUser(SNN, torch.nn.BCELoss, data_loader)
     _ = user.test_network(
-        # TODO
+        {},
+        {},
+        path_to_network=path,
+        plot_loss=True,
+        sum_correct_preds=sum_correct_preds,
     )
     # ===============
