@@ -1,3 +1,9 @@
+# Call for Feedback
+Please open the 
+[form](https://docs.google.com/forms/d/e/1FAIpQLScuvKsRAM3kEqqihPAEUc987nC7fKxNkgrQK-OWnGjyPS3S3g/viewform)
+to give us some feedback!
+
+
 # Deep Learning Workshop 2023: Preparation and Installation Guide
 
 Welcome to the Github page of the Deep Learning Workshop, we are glad
