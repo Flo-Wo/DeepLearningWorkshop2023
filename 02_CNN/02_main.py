@@ -74,13 +74,10 @@ if __name__ == "__main__":
         int
             Number of correct predictions (depends on the decision threshold).
         """
+        pass
         # ===============
         # use p=0.5 as a threshold, if value > p => return 1, else 0
-        pred = torch.where(
-            prediction_output > threshold, 1, 0
-        )  # get the index of the max log-probability
         # ===============
-        return pred.eq(target_output.view_as(pred)).sum().item()
 
     # TODO: 2,d) Train your network using the trainer instantiated above
     # ===============
