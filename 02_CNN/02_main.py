@@ -87,7 +87,7 @@ if __name__ == "__main__":
         loss_params={},
         optimizer_params={},
         scheduler_params={},
-        sum_correct_preds=sum_correct_preds,
+        # sum_correct_preds=sum_correct_preds,
     )
     # ===============
 
@@ -99,6 +99,6 @@ if __name__ == "__main__":
         {},
         path_to_network=path,
         plot_loss=True,
-        sum_correct_preds=sum_correct_preds,
+        # sum_correct_preds=sum_correct_preds,
     )
     # ===============
