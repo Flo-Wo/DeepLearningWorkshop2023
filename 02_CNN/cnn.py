@@ -134,7 +134,31 @@ class DataLoaderSNN:
         # testing by performin a random split and afterwards we use the DataLoader
         # class to construct three dataloaders ("train", "test", "val")
         # ===============
-        pass
+        total_train_dataset = SignatureDataset(
+            train_meta_path, train_path, transform=transform
+        )
+        len_train = int(len(total_train_dataset) * train_val_ratio)
+        len_val = len(total_train_dataset) - len_train
+
+        # split the original train data again into train + validation
+        train_subset, val_subset = torch.utils.data.random_split(
+            total_train_dataset,
+            [
+                len_train,
+                len_val,
+            ],
+        )
+        test_dataset = SignatureDataset(test_meta_path, test_path, transform=transform)
+
+        self.train_loader = torch.utils.data.DataLoader(
+            dataset=train_subset, batch_size=batch_size, shuffle=True
+        )
+        self.val_loader = torch.utils.data.DataLoader(
+            dataset=val_subset, batch_size=batch_size, shuffle=False
+        )
+        self.test_loader = torch.utils.data.DataLoader(
+            dataset=test_dataset, batch_size=batch_size, shuffle=False
+        )
         # ===============
 
     def __call__(self, mode: str):
@@ -194,11 +218,12 @@ class SignatureDataset(Dataset):
         # Load the csv-table, compute the length of the dataset and save the transformers
         # as a class attribute
         # ===============
-        self.annotations = 
+        # NOTE: give the self.____ part inside the solution (columns fully given)
+        self.annotations = pd.read_csv(annotations_path)
         self.annotations.columns = ["reference", "questioned", "label"]
         self.data_path = data_path
-        self.len_dataset = 
-        self.transform = 
+        self.len_dataset = len(self.annotations)
+        self.transform = transform
         # ===============
 
     def __getitem__(self, index: int):
@@ -222,19 +247,20 @@ class SignatureDataset(Dataset):
         """
         # TODO: 1,a) Check the docstring of the function for a more detailed
         # description
-        # We read the two images, load the label (we transform the label to a float
+        # We read the two images using the function below,
+        # load the label (we transform the label to a float
         # and afterwards to a torch tensor), the optional transformers are applied
-        # and the two tensors and their corresponding label is returned
+        # and the two tensors and their corresponing label is returned
 
         # ===============
-        im1 = 
-        im2 = 
+        im1 = self._read_image(index, 0)
+        im2 = self._read_image(index, 1)
         y_label = torch.from_numpy(
             np.array([self.annotations.iat[index, 2]], dtype=np.float32)
         )
         if self.transform:
-            im1 = 
-            im2 = 
+            im1 = self.transform(im1)
+            im2 = self.transform(im2)
         return im1, im2, y_label
         # ===============
 
