@@ -132,30 +132,35 @@ if __name__ == "__main__":
     # We extract the label by taking the index with the maximum probability
     # Check for equality and sum the number of correct predictions
     # ============
-    # def sum_correct_preds(pred_output: torch.tensor, target_output: torch.tensor):
-    #     pred = pred_output.argmax(
-    #         dim=1, keepdim=True
-    #     )  # get the index of the max log-probability
-    #     return pred.eq(target_output.view_as(pred)).sum().item()
+    def sum_correct_preds(pred_output: torch.tensor, target_output: torch.tensor):
+        pred = pred_output.argmax(
+            dim=1, keepdim=True
+        )  # get the index of the max log-probability
+        return pred.eq(target_output.view_as(pred)).sum().item()
 
     # ============
 
     # TODO: Bonus, d)
     # Add a custom regularization function to your network
     # ============
-    # def regularization(type="L1", damping: float = 0.001):
-    #     if type == "L1":
-    #         def add_to_loss(model):
-    #             return damping * sum(p.abs().sum() for p in model.parameters())
-    #     elif type == "L2":
-    #         def add_to_loss(model):
-    #             return damping * sum(p.pow(2.0).sum() for p in model.parameters())
-    #     else:
-    #         raise NotImplementedError("Regularization type is not implemented")
-    #     return add_to_loss
+    def regularization(type="L1", damping: float = 0.001):
+        if type == "L1":
+
+            def add_to_loss(model):
+                return damping * sum(p.abs().sum() for p in model.parameters())
+
+        elif type == "L2":
+
+            def add_to_loss(model):
+                return damping * sum(p.pow(2.0).sum() for p in model.parameters())
+
+        else:
+            raise NotImplementedError("Regularization type is not implemented")
+        return add_to_loss
+
     # ============
 
-    # # TODO: 4,b)
+    # TODO: 4,b)
     # ============
     path = trainer.train_network(
         12,
@@ -166,7 +171,7 @@ if __name__ == "__main__":
         # {"lr": 0.001, "weight_decay": 0.001}
         scheduler_params=dict(factor=0.9, patience=1),
         # TODO: Bonus,a)
-        # sum_correct_preds=sum_correct_preds,
+        sum_correct_preds=sum_correct_preds,
         # TODO: Bonus,d)
         # regularization=regularization("L2"),
     )
@@ -184,20 +189,21 @@ if __name__ == "__main__":
         loss_params,
         path,
         plot_loss=False,
-        # sum_correct_preds=sum_correct_preds,
+        # TODO: Bonus, a)
+        sum_correct_preds=sum_correct_preds,
     )
     plot_performance(cache_default)
     # ============
 
-    # path2 = "input_shape_784_hidden_shape_500_num_classes_10_activation_func_<class 'torch.nn.modules.activation.ReLU'>_use_batch_norm_True_<class 'dnn.DNN'>"
-    # cache_batch_norm = user.test_network(
-    #     dict({"use_batch_norm": True}, **network_params),
-    #     loss_params,
-    #     path2,
-    #     plot_loss=False,
-    #     sum_correct_preds = sum_correct_preds,
-    # )
-    # plot_performance([cache_default, cache_batch_norm])
+    path2 = "input_shape_784_hidden_shape_500_num_classes_10_activation_func_<class 'torch.nn.modules.activation.ReLU'>_use_batch_norm_True_<class 'dnn.DNN'>"
+    cache_batch_norm = user.test_network(
+        dict({"use_batch_norm": True}, **network_params),
+        loss_params,
+        path2,
+        plot_loss=False,
+        sum_correct_preds=sum_correct_preds,
+    )
+    plot_performance([cache_default, cache_batch_norm])
 
     # TODO: 4,d) Check the description of the NetworkUser's ``get_predictor``-function
     # We extract the prediction function of the Networkuser to manually test our network
