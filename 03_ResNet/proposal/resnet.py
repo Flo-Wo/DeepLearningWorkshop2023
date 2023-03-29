@@ -198,7 +198,9 @@ class DataLoaderResNet:
         # =================
         transform_train = transforms.Compose(
             [
-                # TODO
+                transforms.RandomResizedCrop(224),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
                 # mean, std for each of the three channels, see the pretrained version
                 transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
             ]
@@ -209,7 +211,9 @@ class DataLoaderResNet:
         # =================
         transform_test = transforms.Compose(
             [
-                # TODO
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
                 # mean, std for each of the three channels, see the pretrained version
                 transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
             ]
@@ -220,21 +224,25 @@ class DataLoaderResNet:
         # =================
         # Image Folder uses the folder names to generate the labels automatically
         total_train_dataset = datasets.ImageFolder(
-            # TODO
+            os.path.join(data_dir, "train"), transform_train
         )
 
         test_dataset = datasets.ImageFolder(
-            # TODO
+            os.path.join(data_dir, "test"), transform_test
         )
         # =================
 
         # TODO: 1,a) Split the training data into training and validation data
         # =================
-        len_train =  # TODO
-        len_val = # TODO
+        len_train = int(len(total_train_dataset) * train_val_ratio)
+        len_val = len(total_train_dataset) - len_train
         # split the original train data again into train + validation
         train_subset, val_subset = torch.utils.data.random_split(
-            # TODO
+            total_train_dataset,
+            [
+                len_train,
+                len_val,
+            ],
         )
         # =================
 
@@ -279,6 +287,7 @@ class DataLoaderResNet:
             raise NotImplementedError(
                 "Mode should be either 'train'/'val'/'test', check your call please."
             )
+
 
 if __name__ == "__main__":
     test_input = torch.zeros(1, 3, 224, 224)
