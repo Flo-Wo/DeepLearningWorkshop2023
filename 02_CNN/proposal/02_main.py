@@ -2,7 +2,7 @@
 #
 # This program is licensed under the Creative Commons Attribution 4.0 International License.
 # To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/.
-from utils import NetworkTrainer, NetworkUser
+from utils import NetworkTrainer, NetworkUser, plot_performance
 from cnn import SNN, DataLoaderSNN
 import torch
 import torch.nn as nn
@@ -74,31 +74,35 @@ if __name__ == "__main__":
         int
             Number of correct predictions (depends on the decision threshold).
         """
-        pass
         # ===============
         # use p=0.5 as a threshold, if value > p => return 1, else 0
+        pred = torch.where(
+            prediction_output > threshold, 1, 0
+        )  # get the index of the max log-probability
         # ===============
+        return pred.eq(target_output.view_as(pred)).sum().item()
 
     # TODO: 2,d) Train your network using the trainer instantiated above
     # ===============
     path = trainer.train_network(
-        10,
+        4,
         network_params,
         loss_params={},
         optimizer_params={},
         scheduler_params={},
-        # sum_correct_preds=sum_correct_preds,
+        sum_correct_preds=sum_correct_preds,
     )
     # ===============
 
     # TODO. 2,e) Evaluate your network
     # ===============
+    path = "my_network_parameters"
     user = NetworkUser(SNN, torch.nn.BCELoss, data_loader)
-    _ = user.test_network(
+    cnn_cache = user.test_network(
         {},
         {},
         path_to_network=path,
         plot_loss=True,
-        # sum_correct_preds=sum_correct_preds,
+        sum_correct_preds=sum_correct_preds,
     )
     # ===============
