@@ -172,8 +172,7 @@ class ResNetPretrained(models.ResNet):
     def __new__(self, num_classes: int, feature_extract: bool = True, **kwargs):
         # TODO: 3,a) Load the network with pretrained weights
         # =================
-        # use default weights for the newest trained netowork, you can use also
-        # use a different model
+        # use default weights for the newest trained netowork
         model_ft = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
         # =================
 
@@ -183,8 +182,7 @@ class ResNetPretrained(models.ResNet):
         # the gradients for all layers, except for the last one
         _set_parameter_requires_grad(model_ft, feature_extract)
         num_features = model_ft.fc.in_features
-        model_ft.fc = # TODO
-        # =================
+        model_ft.fc = nn.Linear(num_features, num_classes)
         return model_ft
 
 

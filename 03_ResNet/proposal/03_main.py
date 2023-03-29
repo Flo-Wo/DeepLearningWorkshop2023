@@ -130,17 +130,24 @@ def bonus_visualization(model: nn.Module, data_loader: DataLoader):
 
 
 if __name__ == "__main__":
-    # TODO: 2,c) Instantiate your custom data loader
+    # TODO: 2,c) Instantiate your custom data loader and train your network
     # =================
-    data_loader =  # TODO
+    data_loader = DataLoaderResNet(0.9, 64)
     custom_trainer = NetworkTrainer(
         ResNetFactory,
-        # TODO
+        nn.CrossEntropyLoss,
+        torch.optim.Adam,
+        torch.optim.lr_scheduler.ReduceLROnPlateau,
+        data_loader,
     )
-    network_params_custom = {
-        "in_channels": # TODO, 
-        "num_classes": # TODO,
-    }
+    network_params_custom = {"in_channels": 3, "num_classes": 2}
+    path_custom = custom_trainer.train_network(
+        10,
+        network_params_custom,
+        loss_params={},
+        optimizer_params={},
+        scheduler_params={},
+    )
     # =================
 
     # TODO: Bonus, a) Sum correct preditions to obtain the accuracy in percentage points
@@ -152,48 +159,51 @@ if __name__ == "__main__":
         return 0
         # =================
 
-    # TODO: 2,c) Train your network
-    # =================
-    path_custom = custom_trainer.train_network(
-        # TODO
-    )
-    # =================
-
-
     # TODO: 2,d) Evaluate the network on the validation dataset
     # =================
-    user = NetworkUser(
-        # TODO
-    )
+    user = NetworkUser(ResNetFactory, nn.CrossEntropyLoss, data_loader)
     cache_custom = user.test_network(
-        network_params_custom, {}, path_to_network=path_custom, plot_loss=False,
+        network_params_custom,
+        {},
+        path_to_network=path_custom,
+        plot_loss=False,
+        sum_correct_preds=sum_correct_preds,
     )
     # =================
 
     # TODO: 3,c) Train the last layer of the pretrained network
     # =================
-    # network_params_pretrained = {
-    #     "pretrained": # TODO,
-    #     "extract_features": # TODO, 
-    #     "in_channels": # TODO,
-    #     "num_classes": # TODO,
-    # }
+    network_params_pretrained = {
+        "pretrained": True,
+        "extract_features": True,
+        "in_channels": 3,
+        "num_classes": 2,
+    }
 
-    # path_pretrained = custom_trainer.train_network(
-    #     # TODO
-    # )
+    path_pretrained = custom_trainer.train_network(
+        10,
+        network_params_pretrained,
+        loss_params={},
+        optimizer_params={},
+        scheduler_params={},
+        sum_correct_preds=sum_correct_preds,
+    )
     # =================
 
     # TODO: 3,d) Evaluate the pretrained network on the validation data
     # =================
-    # cache_pretrained = user.test_network(
-    #     # TODO
-    # )
+    cache_pretrained = user.test_network(
+        network_params_pretrained,
+        {},
+        path_to_network=path_pretrained,
+        plot_loss=False,
+        sum_correct_preds=sum_correct_preds,
+    )
     # =================
 
     # TODO: 2,d) and 3,d) Plot the results for both of the networks
     # =================
-
+    plot_performance(cache_custom, cache_pretrained)
     # =================
 
     # TODO: Bonus b,v)
