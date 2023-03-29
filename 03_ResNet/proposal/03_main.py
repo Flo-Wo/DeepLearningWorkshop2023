@@ -28,13 +28,15 @@ def extract_conv_layers(model: nn.Module):
     for child in model_children:
         if type(child) == nn.Conv2d:
             counter += 1
-            # TODO
+            model_weights.append(child.weight)
+            conv_layers.append(child)
         elif type(child) == nn.Sequential:
             for sequ_child in child:
                 for channel in sequ_child.children():
                     if type(channel) == nn.Conv2d:
                         counter += 1
-                        # TODO
+                        model_weights.append(channel.weight)
+                        conv_layers.append(channel)
     print("#Conv layer: {}".format(counter))
     # =================
     return conv_layers, model_weights
@@ -50,9 +52,7 @@ def vis_conv_kernel(model_weights: list) -> None:
         plt.subplot(
             8, 8, i + 1
         )  # (8, 8) because in conv0 we have 7x7 filters and total of 64 (see printed shapes)
-        plt.imshow(
-            # TODO
-        )
+        plt.imshow(filter[0, :, :].detach(), cmap="gray")
         plt.axis("off")
         plt.savefig("./bonus_vis/kernels/filter.png")
     plt.title("Visualization of the convolutional kernels (weights of the first layer)")
@@ -70,9 +70,7 @@ def forward_image(conv_layers: list, img: torch.tensor):
     results = [conv_layers[0](img)]
     for i in range(1, len(conv_layers)):
         # pass the result from the last layer to the next layer
-        results.append(
-            # TODO
-        )
+        results.append(conv_layers[i](results[-1]))
     # =================
     return results
 
@@ -86,13 +84,12 @@ def vis_feature_maps(outputs: list) -> None:
         plt.figure(figsize=(20, 20))
         layer_viz = outputs[num_layer][0, :, :, :]
         layer_viz = layer_viz.data
+        print(layer_viz.size())
         for i, filter in enumerate(layer_viz):
             if i == 64:  # we will visualize only 8x8 channels from each layer
                 break
             plt.subplot(8, 8, i + 1)
-            plt.imshow(
-                # TODO
-            )
+            plt.imshow(filter, cmap="gray")
             plt.axis("off")
         print("Saving feature maps of layer {}".format(num_layer))
         plt.savefig("./bonus_vis/feature_maps/layer_{}.png".format(num_layer))
@@ -141,23 +138,25 @@ if __name__ == "__main__":
         data_loader,
     )
     network_params_custom = {"in_channels": 3, "num_classes": 2}
-    path_custom = custom_trainer.train_network(
-        10,
-        network_params_custom,
-        loss_params={},
-        optimizer_params={},
-        scheduler_params={},
-    )
-    # =================
 
     # TODO: Bonus, a) Sum correct preditions to obtain the accuracy in percentage points
     def sum_correct_preds(
         prediction_output: torch.tensor,
         target_output: torch.tensor,
     ):
-        # =================
-        return 0
-        # =================
+        # could also use max, returns: value, idx = torch.max()
+        preds = torch.argmax(prediction_output, dim=1)
+        return torch.sum(preds == target_output.data)
+
+    path_custom = custom_trainer.train_network(
+        10,
+        network_params_custom,
+        loss_params={},
+        optimizer_params={},
+        scheduler_params={},
+        sum_correct_preds=sum_correct_preds,
+    )
+    # =================
 
     # TODO: 2,d) Evaluate the network on the validation dataset
     # =================
