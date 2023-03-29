@@ -230,4 +230,10 @@ class NetworkTrainer:
         filename = ""
         for key, value in network_params.items():
             filename += "{}_{}_".format(key, value)
-        return filename + str(network_class)
+        filename += str(network_class)
+        return self._remove_special_chars(filename)
+
+    def _remove_special_chars(self, filename: str) -> str:
+        """Remove special characters for windows filenames."""
+        remove_char = ["<", ">", ":", '"', "/", "", "|", "?", "*"]
+        return "".join(["" if i in remove_char else i for i in filename])
