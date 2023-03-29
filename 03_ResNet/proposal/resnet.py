@@ -21,12 +21,22 @@ class ResNetCell(nn.Module):
         out_channels : int
             Number of output channels.
         """
+        # TODO: 2,a)
         super(ResNetCell, self).__init__()
         # TODO: 2,a) Implement step 1
         # =================
         # we use full pre-activation
         self.step1 = nn.Sequential(
-            # TODO
+            nn.BatchNorm2d(in_channels),
+            nn.ReLU(),
+            # stride of 2 is given by the original paper
+            nn.Conv2d(
+                in_channels,
+                out_channels,
+                kernel_size=3,
+                padding=1,
+                stride=2,
+            ),
         )
         # =================
 
@@ -35,17 +45,34 @@ class ResNetCell(nn.Module):
         # we use the same size (out_channels, out_channels),
         # as in the (original) ResNet paper, again we use pre-activation
         self.step2 = nn.Sequential(
-            # TODO
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(),
+            nn.Conv2d(
+                out_channels,
+                out_channels,
+                kernel_size=3,
+                padding=1,
+                stride=2,
+            ),
         )
         # =================
 
         # TODO: 2,a) Check the projection case
         # =================
         # check whether we need a downsampling operation (implement by using
-        # a conv2d operation)
+        # a conv1d operation)
         if in_channels != out_channels:
             self.shortcut = nn.Sequential(
-                # TODO
+                # as we use a 1x1 kernel, padding is useless
+                # we need to use twice the stride for the last operation
+                # bias = False based on the pytorch internal version
+                nn.Conv2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size=1,
+                    stride=4,
+                    bias=False,
+                )
             )
         else:
             self.shortcut = nn.Sequential()
@@ -67,8 +94,11 @@ class ResNetCell(nn.Module):
         """
         # TODO: 2,a) Perform a forward pass with the steps implement above
         # =================
-        pass
+        shortcut = self.shortcut(input)
+        res_inner = self.step1(input)
+        residual = self.step2(res_inner)
         # =================
+        return residual + shortcut
 
 
 class ResNet(nn.Module):
@@ -88,26 +118,29 @@ class ResNet(nn.Module):
         # first convolutional layer with a max-pooling layer (originally with 64
         # kernels)
         self.conv_layer = nn.Sequential(
-            # TODO
+            nn.Conv2d(in_channels, 8, kernel_size=7, stride=2, padding=3),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(8),
+            nn.ReLU(),
         )
         # =================
 
         # TODO: 2,b) Add three ResNetCells
         # =================
         # define the residual layers by using our ResNetCell-class
-        self.res1 = 
-        self.res2 = 
-        self.res3 = 
+        self.res1 = ResNetCell(8, 16)
+        self.res2 = ResNetCell(16, 32)
+        self.res3 = ResNetCell(32, 64)
         # =================
 
         # TODO: 2,b) Add a global average pooling and a flattening layer
         # =================
-        self.gap = 
+        self.gap = nn.Sequential(nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten())
         # =================
 
         # TODO: 2,b) Add a fully connected layer (feature compression)
         # =================
-        self.fcl = 
+        self.fcl = nn.Sequential(nn.Linear(64, num_classes))
         # =================
 
     def forward(self, input: torch.tensor):
@@ -126,8 +159,13 @@ class ResNet(nn.Module):
         """
         # TODO: 2,b) Use the layers implement above to define a forward pass
         # =================
-        pass
+        feat = self.conv_layer(input)
+        res1 = self.res1(feat)
+        res2 = self.res2(res1)
+        res3 = self.res3(res2)
+        gap = self.gap(res3)
         # =================
+        return self.fcl(gap)
 
 
 class ResNetPretrained(models.ResNet):
