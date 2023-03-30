@@ -61,21 +61,18 @@ class ResNetCell(nn.Module):
         # =================
         # check whether we need a downsampling operation (implement by using
         # a conv1d operation)
-        if in_channels != out_channels:
-            self.shortcut = nn.Sequential(
-                # as we use a 1x1 kernel, padding is useless
-                # we need to use twice the stride for the last operation
-                # bias = False based on the pytorch internal version
-                nn.Conv2d(
-                    in_channels,
-                    out_channels,
-                    kernel_size=1,
-                    stride=4,
-                    bias=False,
-                )
+        self.shortcut = nn.Sequential(
+            # as we use a 1x1 kernel, padding is useless
+            # we need to use twice the stride for the last operation
+            # bias = False based on the pytorch internal version
+            nn.Conv2d(
+                in_channels,
+                out_channels,
+                kernel_size=1,
+                stride=4,
+                bias=False,
             )
-        else:
-            self.shortcut = nn.Sequential()
+        )
         # =================
 
     def forward(self, input: torch.tensor):

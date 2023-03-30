@@ -43,12 +43,9 @@ class ResNetCell(nn.Module):
         # =================
         # check whether we need a downsampling operation (implement by using
         # a conv2d operation)
-        if in_channels != out_channels:
-            self.shortcut = nn.Sequential(
-                # TODO
-            )
-        else:
-            self.shortcut = nn.Sequential()
+        self.shortcut = nn.Sequential(
+            # TODO
+        )
         # =================
 
     def forward(self, input: torch.tensor):
